@@ -1,4 +1,181 @@
-Находясь в папке infra, выполните команду docker-compose up. При выполнении этой команды контейнер frontend, описанный в docker-compose.yml, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
+# Фудграм - сайт для публикации рецептов
+![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
+![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
+![](https://img.shields.io/badge/docker-257bd6?style=for-the-badge&logo=docker&logoColor=white)
+![](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white)
 
-По адресу http://localhost изучите фронтенд веб-приложения, а по адресу http://localhost/api/docs/ — спецификацию API.
+Веб-приложение для публикации рецептов, подписки на авторов и создания списков покупок.
 
+## Технологии
+
+- **Backend**: Django 3.2, Django REST Framework
+- **Frontend**: React (SPA)
+- **База данных**: PostgreSQL
+- **Веб-сервер**: Nginx
+- **Контейнеризация**: Docker, Docker Compose
+- **Аутентификация**: Token-based authentication
+
+## Возможности
+
+- Регистрация и аутентификация пользователей
+- Публикация рецептов с фотографиями
+- Система тегов для категоризации рецептов
+- Подписки на авторов
+- Добавление рецептов в избранное
+- Список покупок с возможностью скачивания
+- Фильтрация рецептов по тегам, автору, избранному
+- Админ-панель для управления контентом
+
+## Локальная разработка
+
+### Требования
+
+- Python 3.9+
+- Node.js (для фронтенда)
+- PostgreSQL (опционально, можно использовать SQLite для тестирования)
+
+### Установка
+
+1. Клонируйте репозиторий:
+```bash
+git clone <repository-url>
+cd foodgram
+```
+
+2. Создайте виртуальное окружение и установите зависимости:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# или venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+```
+
+3. Создайте файл `.env` в папке `backend/`:
+```
+SECRET_KEY=your-secret-key
+DEBUG=True
+USE_SQLITE=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+4. Выполните миграции:
+```bash
+python manage.py migrate
+```
+
+5. Загрузите ингредиенты:
+```bash
+python manage.py load_ingredients
+```
+
+6. Создайте тестовые данные:
+```bash
+python manage.py create_test_data
+```
+
+7. Запустите сервер:
+```bash
+python manage.py runserver 8080
+```
+
+API будет доступно по адресу: http://localhost:8080/api/
+Админка: http://localhost:8080/admin/ (admin/admin123)
+
+## Развертывание с Docker
+
+### Требования
+
+- Docker
+- Docker Compose
+
+### Запуск
+
+1. Перейдите в папку `infra/`:
+```bash
+cd infra
+```
+
+2. Создайте файл `.env`:
+```
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+USE_SQLITE=False
+ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
+
+POSTGRES_DB=foodgram
+POSTGRES_USER=foodgram_user
+POSTGRES_PASSWORD=your-strong-password
+DB_HOST=db
+DB_PORT=5432
+```
+
+3. Запустите контейнеры:
+```bash
+docker-compose up -d
+```
+
+4. Выполните миграции:
+```bash
+docker-compose exec backend python manage.py migrate
+```
+
+5. Загрузите ингредиенты:
+```bash
+docker-compose exec backend python manage.py load_ingredients
+```
+
+6. Создайте суперпользователя:
+```bash
+docker-compose exec backend python manage.py createsuperuser
+```
+
+7. Соберите статические файлы:
+```bash
+docker-compose exec backend python manage.py collectstatic --noinput
+```
+
+Приложение будет доступно по адресу: http://localhost/
+
+## API Документация
+
+API документация доступна по адресу: `/api/docs/`
+
+### Основные эндпоинты:
+
+- `GET /api/users/` - список пользователей
+- `POST /api/users/` - регистрация пользователя
+- `GET /api/recipes/` - список рецептов
+- `POST /api/recipes/` - создание рецепта
+- `GET /api/tags/` - список тегов
+- `GET /api/ingredients/` - список ингредиентов
+- `POST /api/auth/token/login/` - получение токена
+- `POST /api/auth/token/logout/` - удаление токена
+
+### Аутентификация
+
+Для доступа к защищенным эндпоинтам используйте токен в заголовке:
+```
+Authorization: Token <your-token>
+```
+
+## Структура проекта
+
+```
+foodgram/
+├── backend/           # Django приложение
+│   ├── api/          # API приложение
+│   ├── recipes/      # Модели рецептов
+│   ├── users/        # Модели пользователей
+│   └── foodgram/     # Настройки проекта
+├── frontend/         # React приложение
+├── infra/           # Nginx конфигурация
+│   └── nginx.conf
+├── data/            # Данные для загрузки
+└── docs/            # API документация
+```
+
+## Автор
+
+* Семен Репинин https://github.com/SemRepin

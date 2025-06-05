@@ -1,0 +1,58 @@
+version: '3'
+
+volumes:
+  pg_data:
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:13
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: foodgram
+      POSTGRES_USER: foodgram_user
+      POSTGRES_PASSWORD: foodgram_password
+    
+
+  backend:
+    build: ./backend/
+    env_file: .env
+    volumes:
+      - static:/app/collected_static
+      - media:/app/media
+      - ./data:/data
+    depends_on:
+      - db
+    environment:
+      DEBUG: False
+      USE_SQLITE: False
+      POSTGRES_DB: foodgram
+      POSTGRES_USER: foodgram_user
+      POSTGRES_PASSWORD: foodgram_password
+      DB_HOST: db
+      DB_PORT: 5432
+
+  frontend:
+    env_file: .env
+    build: ./frontend/
+    command: sh -c "cp -r /app/build/static/* /frontend_static/ && cp /app/build/*.* /frontend_static/"
+    volumes:
+      - static:/frontend_static
+
+  gateway:
+    build: ./infra/
+    env_file: .env
+    ports:
+      - "8080:80"
+    volumes:
+      - static:/static
+      - media:/media
+    depends_on:
+      - backend
+      - frontend
+
+
