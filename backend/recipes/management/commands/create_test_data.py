@@ -22,7 +22,9 @@ class Command(BaseCommand):
                 last_name="Админов",
             )
             self.stdout.write(
-                self.style.SUCCESS("Создан суперпользователь: admin/admin123")
+                self.style.SUCCESS(
+                    "Создан суперпользователь: admin@foodgram.com/admin123"
+                )
             )
 
         # Создаем тестового пользователя
@@ -36,7 +38,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(
                 self.style.SUCCESS(
-                    "Создан тестовый пользователь: testuser/test123"
+                    "Создан тестовый пользователь: test@foodgram.com/test123"
                 )
             )
 

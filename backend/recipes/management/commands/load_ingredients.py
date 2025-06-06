@@ -17,9 +17,7 @@ class Command(BaseCommand):
             "--path",
             type=str,
             help="Путь к CSV файлу с ингредиентами",
-            default=os.path.join(
-                settings.BASE_DIR.parent, "data", "ingredients.csv"
-            ),
+            default="/data/ingredients.csv",
         )
 
     def handle(self, *args, **options):
