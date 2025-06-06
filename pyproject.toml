@@ -1,0 +1,20 @@
+[tool.black]
+target-version = ["py39"]
+line-length = 79
+skip-string-normalization = true
+extend-exclude = '''
+(
+  backend/collected_static
+  | backend/media
+  | migrations
+)
+'''
+
+[tool.isort]
+profile = "django"
+py_version=39
+line_length = 79
+combine_as_imports = true
+include_trailing_comma = true
+src_paths = ["backend"]
+extend_skip = ["backend/collected_static", "backend/media", "migrations"]

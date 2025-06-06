@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
-from recipes.models import Tag, Recipe, RecipeIngredient, Ingredient
+from recipes.models import Tag
 
 User = get_user_model()
 
@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not User.objects.filter(username="admin").exists():
-            admin = User.objects.create_superuser(
+            _ = User.objects.create_superuser(
                 username="admin",
                 email="admin@foodgram.com",
                 password="admin123",
@@ -27,7 +27,7 @@ class Command(BaseCommand):
             )
 
         if not User.objects.filter(username="testuser").exists():
-            user = User.objects.create_user(
+            _ = User.objects.create_user(
                 username="testuser",
                 email="test@foodgram.com",
                 password="test123",

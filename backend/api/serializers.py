@@ -5,19 +5,12 @@ from django.db import transaction
 from rest_framework import serializers
 
 from recipes.constants import (
-    MIN_COOKING_TIME,
-    MIN_INGREDIENTS_COUNT,
-    RECIPE_MAX_LENGTH,
+    MIN_COOKING_TIME, MIN_INGREDIENTS_COUNT, RECIPE_MAX_LENGTH,
 )
 from recipes.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    ShoppingCart,
-    Tag,
+    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag,
 )
-from users.serializers import CustomUserSerializer, RecipeShortSerializer
+from users.serializers import CustomUserSerializer
 
 
 class Base64ImageField(serializers.ImageField):
@@ -153,7 +146,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate_name(self, value):
-        """Валидация названия рецепта."""
         if not value or not value.strip():
             raise serializers.ValidationError(
                 "Название рецепта не может быть пустым."
@@ -161,7 +153,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def validate_text(self, value):
-        """Валидация описания рецепта."""
         if not value or not value.strip():
             raise serializers.ValidationError(
                 "Описание рецепта не может быть пустым."
@@ -169,7 +160,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def validate_cooking_time(self, value):
-        """Валидация времени приготовления."""
         if value < MIN_COOKING_TIME:
             raise serializers.ValidationError(
                 f"Время приготовления должно быть больше либо равно "
@@ -178,7 +168,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate_ingredients(self, value):
-        """Валидация ингредиентов."""
         if not value:
             raise serializers.ValidationError("Нужен хотя бы один ингредиент.")
 
@@ -206,7 +195,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate_tags(self, value):
-        """Валидация тегов."""
         if not value:
             raise serializers.ValidationError("Нужен хотя бы один тег.")
 

@@ -1,6 +1,7 @@
 # flake8: noqa
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -148,7 +149,6 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
 }
 
-# Настройки логирования для отладки
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -169,14 +169,11 @@ LOGGING = {
     },
 }
 
-# Настройки email для разработки
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 SERVER_EMAIL = 'root@localhost'
 
-# Дополнительные настройки для обработки ошибок
 APPEND_SLASH = True
 
-# Настройки для обработки медиафайлов
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

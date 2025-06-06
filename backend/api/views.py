@@ -3,19 +3,23 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+from recipes.models import (
+    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag,
+)
 from users.serializers import RecipeShortSerializer
 
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeListSerializer, TagSerializer)
-
+from .serializers import (
+    IngredientSerializer, RecipeCreateSerializer, RecipeListSerializer,
+    TagSerializer,
+)
 
 CREATED = status.HTTP_201_CREATED
 NO_CONTENT = status.HTTP_204_NO_CONTENT
@@ -49,13 +53,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = LimitPageNumberPagination
 
     def get_serializer_class(self):
-        """Получить класс сериализатора."""
         if self.action in ["list", "retrieve"]:
             return RecipeListSerializer
         return RecipeCreateSerializer
 
     def perform_create(self, serializer):
-        """Создать рецепт."""
         serializer.save(author=self.request.user)
 
     @action(

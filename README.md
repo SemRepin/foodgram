@@ -3,9 +3,9 @@
 ![](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
 ![](https://img.shields.io/badge/docker-257bd6?style=for-the-badge&logo=docker&logoColor=white)
-![](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white)
+![](https://img.shields.io/badge/-ReactJs-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 
-Веб-приложение для публикации рецептов, подписки на авторов и создания списков покупок.
+Веб-приложение для публикации рецептов, подписки на авторов, создания и экспорта списков покупок.
 
 ## Технологии
 
@@ -39,7 +39,7 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
+git clone https://github.com/SemRepin/foodgram.git
 cd foodgram
 ```
 
@@ -52,7 +52,7 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-3. Создайте файл `.env` в папке `backend/`:
+3. Создайте файл `.env` в папке `foodgram/`:
 ```
 SECRET_KEY=your-secret-key
 DEBUG=True
@@ -81,7 +81,6 @@ python manage.py runserver 8080
 ```
 
 API будет доступно по адресу: http://localhost:8080/api/
-Админка: http://localhost:8080/admin/ (admin/admin123)
 
 ## Развертывание с Docker
 
@@ -92,9 +91,9 @@ API будет доступно по адресу: http://localhost:8080/api/
 
 ### Запуск
 
-1. Перейдите в папку `infra/`:
+1. Перейдите в папку `foodgram/`:
 ```bash
-cd infra
+cd foodgram
 ```
 
 2. Создайте файл `.env`:
@@ -126,21 +125,65 @@ docker-compose exec backend python manage.py migrate
 docker-compose exec backend python manage.py load_ingredients
 ```
 
-6. Создайте суперпользователя:
+6. Загрузите тестовые данные:
+```bash
+docker-compose exec backend python manage.py create_test_data
+```
+
+7. Создайте суперпользователя:
 ```bash
 docker-compose exec backend python manage.py createsuperuser
 ```
 
-7. Соберите статические файлы:
+8. Соберите статические файлы:
 ```bash
 docker-compose exec backend python manage.py collectstatic --noinput
 ```
 
-Приложение будет доступно по адресу: http://localhost/
+Приложение будет доступно по адресу: http://localhost:8080/
 
-## API Документация
+## Развертывание на удаленном сервере (Linux)
 
-API документация доступна по адресу: `/api/docs/`
+1. Создайте директорию foodgram:
+
+```bash
+mkdir foodgram
+```
+
+2. Перейдите в папку с проектом:
+
+```bash
+cd foodgram
+```
+
+3. Создайте файл .env и заполните его своими данными:
+
+```bash
+POSTGRES_DB=foodgram
+POSTGRES_USER=foodgram_user
+POSTGRES_PASSWORD=foodgram_password
+DB_NAME=foodgram
+DB_HOST=db
+ALLOWED_HOSTS=123.456.789.0
+SECRET_KEY=super_secret_key
+```
+
+4. Установите Docker Compose:
+
+```bash
+sudo apt-get install docker-compose-plugin
+```
+
+5. Скопируйте файл docker-compose.production.yml в директорию проекта и поочередно выполните команды:
+
+```bash
+sudo docker compose -f docker-compose.production.yml pull
+sudo docker compose -f docker-compose.production.yml down
+sudo docker compose -f docker-compose.production.yml up -d
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+```
 
 ### Основные эндпоинты:
 

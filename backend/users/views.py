@@ -3,17 +3,19 @@ from djoser.serializers import SetPasswordSerializer
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
 from api.pagination import LimitPageNumberPagination
+
 from .models import Follow, User
-from .serializers import (AvatarSerializer, CustomUserCreateSerializer,
-                          CustomUserSerializer, FollowSerializer)
+from .serializers import (
+    AvatarSerializer, CustomUserCreateSerializer, CustomUserSerializer,
+    FollowSerializer,
+)
 
-
-# Константы HTTP статусов
 CREATED = status.HTTP_201_CREATED
 NO_CONTENT = status.HTTP_204_NO_CONTENT
 BAD_REQUEST = status.HTTP_400_BAD_REQUEST
