@@ -12,7 +12,6 @@ class Command(BaseCommand):
     help = "Создать тестовые данные"
 
     def handle(self, *args, **options):
-        # Создаем суперпользователя
         if not User.objects.filter(username="admin").exists():
             admin = User.objects.create_superuser(
                 username="admin",
@@ -27,7 +26,6 @@ class Command(BaseCommand):
                 )
             )
 
-        # Создаем тестового пользователя
         if not User.objects.filter(username="testuser").exists():
             user = User.objects.create_user(
                 username="testuser",
@@ -42,7 +40,6 @@ class Command(BaseCommand):
                 )
             )
 
-        # Создаем теги
         tags_data = [
             {"name": "Завтрак", "slug": "breakfast"},
             {"name": "Обед", "slug": "lunch"},
