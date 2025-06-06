@@ -24,6 +24,7 @@ from api.views import RecipeViewSet
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include("users.urls")),
     path("api/", include("api.urls")),
     path(
         "s/<int:pk>/",

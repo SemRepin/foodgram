@@ -1,9 +1,7 @@
 import base64
 
 from django.core.files.base import ContentFile
-from django.core.validators import EmailValidator, RegexValidator
 from django.db import transaction
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.constants import (
@@ -19,12 +17,7 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from users.constants import (
-    EMAIL_MAX_LENGTH,
-    NAME_MAX_LENGTH,
-    USERNAME_MAX_LENGTH,
-)
-from users.models import Follow, User
+from users.serializers import CustomUserSerializer, RecipeShortSerializer
 
 
 class Base64ImageField(serializers.ImageField):
@@ -36,110 +29,6 @@ class Base64ImageField(serializers.ImageField):
             ext = format.split("/")[-1]
             data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
         return super().to_internal_value(data)
-
-
-class CustomUserCreateSerializer(UserCreateSerializer):
-    """Сериализатор для создания пользователя."""
-
-    email = serializers.EmailField(
-        required=True,
-        max_length=EMAIL_MAX_LENGTH,
-        validators=[EmailValidator(message="Некорректный email")],
-    )
-    username = serializers.CharField(
-        required=True,
-        max_length=USERNAME_MAX_LENGTH,
-        validators=[
-            RegexValidator(
-                r"^[\w.@+-]+$", "Недопустимые символы в имени пользователя"
-            )
-        ],
-    )
-    first_name = serializers.CharField(
-        required=True, max_length=NAME_MAX_LENGTH
-    )
-    last_name = serializers.CharField(
-        required=True, max_length=NAME_MAX_LENGTH
-    )
-    password = serializers.CharField(required=True, write_only=True)
-
-    class Meta:
-        model = User
-        fields = ("email", "username", "first_name", "last_name", "password")
-
-    def validate_email(self, value):
-        """Проверить уникальность email."""
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError(
-                "Пользователь с таким email уже существует."
-            )
-        return value
-
-    def validate_username(self, value):
-        """Проверить уникальность username."""
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError(
-                "Пользователь с таким username уже существует."
-            )
-        return value
-
-    def create(self, validated_data):
-        """Создать нового пользователя."""
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def to_representation(self, instance):
-        """Возвращает данные созданного пользователя без пароля."""
-        return {
-            "email": instance.email,
-            "id": instance.id,
-            "username": instance.username,
-            "first_name": instance.first_name,
-            "last_name": instance.last_name,
-        }
-
-
-class CustomUserSerializer(UserSerializer):
-    """Сериализатор для пользователя."""
-
-    is_subscribed = serializers.SerializerMethodField()
-    avatar = Base64ImageField(required=False, allow_null=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "avatar",
-        )
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get("request")
-        if not request or not hasattr(request, "user"):
-            return False
-
-        user = request.user
-        if not user or user.is_anonymous:
-            return False
-
-        return Follow.objects.filter(user=user, author=obj).exists()
-
-
-class AvatarSerializer(serializers.ModelSerializer):
-    """Сериализатор для аватара пользователя."""
-
-    avatar = Base64ImageField(required=False, allow_null=True)
-
-    class Meta:
-        model = User
-        fields = ("avatar",)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -375,66 +264,3 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return RecipeListSerializer(instance, context=self.context).data
-
-
-class RecipeShortSerializer(serializers.ModelSerializer):
-    """Краткий сериализатор для рецепта."""
-
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
-
-
-class FollowSerializer(serializers.ModelSerializer):
-    """Сериализатор для подписок."""
-
-    email = serializers.ReadOnlyField(source="author.email")
-    id = serializers.ReadOnlyField(source="author.id")
-    username = serializers.ReadOnlyField(source="author.username")
-    first_name = serializers.ReadOnlyField(source="author.first_name")
-    last_name = serializers.ReadOnlyField(source="author.last_name")
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
-    avatar = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Follow
-        fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "recipes",
-            "recipes_count",
-            "avatar",
-        )
-
-    def get_avatar(self, obj):
-        """Получить URL аватара автора (если есть)."""
-        if obj.author.avatar:
-            return obj.author.avatar.url
-        return None
-
-    def get_is_subscribed(self, obj):
-        """Проверить подписку."""
-        return True
-
-    def get_recipes(self, obj):
-        """Получить рецепты автора."""
-        request = self.context.get("request")
-        limit = request.GET.get("recipes_limit")
-        recipes = obj.author.recipes.all()
-        if limit:
-            try:
-                limit = int(limit)
-                recipes = recipes[:limit]
-            except (ValueError, TypeError):
-                pass
-        return RecipeShortSerializer(recipes, many=True).data
-
-    def get_recipes_count(self, obj):
-        """Получить количество рецептов автора."""
-        return obj.author.recipes.count()

@@ -31,7 +31,6 @@ class RecipeFilter(filters.FilterSet):
         if not value:
             return queryset
 
-        # Обработка множественных значений тегов
         if hasattr(self.request, "query_params"):
             tags_list = self.request.query_params.getlist("tags")
         else:
