@@ -4,8 +4,11 @@
 ![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
 ![](https://img.shields.io/badge/docker-257bd6?style=for-the-badge&logo=docker&logoColor=white)
 ![](https://img.shields.io/badge/-ReactJs-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+[![Foodgram CI/CD](https://github.com/SemRepin/foodgram/actions/workflows/main.yml/badge.svg)](https://github.com/SemRepin/foodgram/actions/workflows/main.yml)
 
 Веб-приложение для публикации рецептов, подписки на авторов, создания и экспорта списков покупок.
+
+![Foodgram](https://imgur.com/a/L4rcNgP)
 
 ## Технологии
 
@@ -207,16 +210,17 @@ Authorization: Token <your-token>
 
 ```
 foodgram/
-├── backend/           # Django приложение
+├── backend/          # Django приложение
 │   ├── api/          # API приложение
+│   ├── data/         # Данные для загрузки
 │   ├── recipes/      # Модели рецептов
 │   ├── users/        # Модели пользователей
 │   └── foodgram/     # Настройки проекта
 ├── frontend/         # React приложение
-├── infra/           # Nginx конфигурация
-│   └── nginx.conf
-├── data/            # Данные для загрузки
-└── docs/            # API документация
+├── infra/            # Nginx конфигурация
+│   └── nginx.conf      
+├── docs/             # API документация
+└── .github/          # GitHub Actions
 ```
 
 ## Автор
