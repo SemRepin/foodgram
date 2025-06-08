@@ -1,4 +1,4 @@
-![Logo](frontend/public/favicon.png){ width="102" height="90" style="display: block; margin: 0 auto" }
+<img align="right" width="102" height="90" src="frontend/public/favicon.png">
 # Foodgram - веб-приложение для публикации рецептов
 ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
