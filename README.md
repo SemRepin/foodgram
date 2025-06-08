@@ -1,4 +1,5 @@
-# Фудграм - сайт для публикации рецептов
+![Logo](frontend/public/favicon.png){ width="102" height="90" style="display: block; margin: 0 auto" }
+# Foodgram - веб-приложение для публикации рецептов
 ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![](https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
@@ -6,9 +7,9 @@
 ![](https://img.shields.io/badge/-ReactJs-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 [![Foodgram CI/CD](https://github.com/SemRepin/foodgram/actions/workflows/main.yml/badge.svg)](https://github.com/SemRepin/foodgram/actions/workflows/main.yml)
 
-Веб-приложение для публикации рецептов, подписки на авторов, создания и экспорта списков покупок.
+Фудграм — это веб-приложение для обмена кулинарными рецептами. Пользователи могут публиковать собственные рецепты, добавлять понравившиеся в избранное и подписываться на обновления других авторов. Зарегистрированным пользователям доступен удобный сервис «Список покупок», который автоматически формирует перечень необходимых ингредиентов для выбранных блюд. Готовый список можно скачать в виде файла для использования в магазине или на кухне!
 
-![Foodgram](https://imgur.com/a/L4rcNgP)
+![Foodgram](https://res.cloudinary.com/dhw34rp0t/image/upload/v1749399003/Screenshot_2025-06-08_at_5.33.40_PM_exquqm.png)
 
 ## Технологии
 
@@ -210,17 +211,19 @@ Authorization: Token <your-token>
 
 ```
 foodgram/
-├── backend/          # Django приложение
+├── backend/          # Django backend
 │   ├── api/          # API приложение
 │   ├── data/         # Данные для загрузки
 │   ├── recipes/      # Модели рецептов
 │   ├── users/        # Модели пользователей
 │   └── foodgram/     # Настройки проекта
-├── frontend/         # React приложение
-├── infra/            # Nginx конфигурация
-│   └── nginx.conf      
+├── frontend/         # React frontend
+├── infra/            # Nginx конфигурация   
 ├── docs/             # API документация
-└── .github/          # GitHub Actions
+├── .github/          # GitHub Actions
+├── .env              # Переменные окружения
+├── docker-compose.yml # Конфигурация Docker
+└── docker-compose.production.yml # Конфигурация Docker для production
 ```
 
 ## Автор
