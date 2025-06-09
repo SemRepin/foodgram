@@ -118,9 +118,9 @@ class CustomUserSerializer(UserSerializer):
         if not user or user.is_anonymous:
             return False
 
-        return self._is_user_subscribed_to_author(user, obj)
+        return self.is_user_subscribed_to_author(user, obj)
 
-    def _is_user_subscribed_to_author(self, user, author):
+    def is_user_subscribed_to_author(self, user, author):
         """Проверить подписку пользователя на автора."""
         return Follow.objects.filter(user=user, author=author).exists()
 

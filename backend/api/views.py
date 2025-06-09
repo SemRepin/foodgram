@@ -67,7 +67,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, **kwargs):
         """Добавить/удалить рецепт из избранного."""
-        return self._add_or_remove_recipe(request, Favorite)
+        return self.add_or_remove_recipe(request, Favorite)
 
     @action(
         detail=True,
@@ -76,20 +76,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, **kwargs):
         """Добавить/удалить рецепт из списка покупок."""
-        return self._add_or_remove_recipe(request, ShoppingCart)
+        return self.add_or_remove_recipe(request, ShoppingCart)
 
-    def _add_or_remove_recipe(self, request, model):
+    def add_or_remove_recipe(self, request, model):
         """Добавить или удалить рецепт из коллекции."""
         user = request.user
         recipe_id = self.kwargs.get("pk")
         recipe = get_object_or_404(Recipe, id=recipe_id)
 
         if request.method == "POST":
-            return self._handle_add_recipe(user, recipe, model)
+            return self.handle_add_recipe(user, recipe, model)
         elif request.method == "DELETE":
-            return self._handle_remove_recipe(user, recipe, model)
+            return self.handle_remove_recipe(user, recipe, model)
 
-    def _handle_add_recipe(self, user, recipe, model):
+    def handle_add_recipe(self, user, recipe, model):
         """Обработать добавление рецепта в коллекцию."""
         if model.objects.filter(user=user, recipe=recipe).exists():
             return Response(
@@ -99,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = RecipeShortSerializer(recipe)
         return Response(serializer.data, status=CREATED)
 
-    def _handle_remove_recipe(self, user, recipe, model):
+    def handle_remove_recipe(self, user, recipe, model):
         """Обработать удаление рецепта из коллекции."""
         obj = model.objects.filter(user=user, recipe=recipe)
         if obj.exists():
@@ -120,8 +120,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {"errors": "Список покупок пуст"}, status=BAD_REQUEST
             )
 
-        ingredients = self._get_shopping_cart_ingredients(user)
-        shopping_list = self._format_shopping_list(ingredients)
+        ingredients = self.get_shopping_cart_ingredients(user)
+        shopping_list = self.format_shopping_list(ingredients)
 
         response = HttpResponse(shopping_list, content_type="text/plain")
         response["Content-Disposition"] = (
@@ -129,7 +129,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         return response
 
-    def _get_shopping_cart_ingredients(self, user):
+    def get_shopping_cart_ingredients(self, user):
         """Получить ингредиенты из списка покупок с общим количеством."""
         return (
             RecipeIngredient.objects.filter(recipe__shopping_cart__user=user)
@@ -138,7 +138,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .order_by("ingredient__name")
         )
 
-    def _format_shopping_list(self, ingredients):
+    def format_shopping_list(self, ingredients):
         """Форматировать список покупок."""
         shopping_list = "Список покупок:\n\n"
         for ingredient in ingredients:

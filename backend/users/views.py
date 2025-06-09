@@ -69,11 +69,11 @@ class CustomUserViewSet(UserViewSet):
         author = get_object_or_404(User, id=author_id)
 
         if request.method == "POST":
-            return self._handle_subscribe(user, author, request)
+            return self.handle_subscribe(user, author, request)
         elif request.method == "DELETE":
-            return self._handle_unsubscribe(user, author)
+            return self.handle_unsubscribe(user, author)
 
-    def _handle_subscribe(self, user, author, request):
+    def handle_subscribe(self, user, author, request):
         """Обработать подписку на автора."""
         if user == author:
             return Response(
@@ -90,7 +90,7 @@ class CustomUserViewSet(UserViewSet):
         serializer = FollowSerializer(follow, context={"request": request})
         return Response(serializer.data, status=CREATED)
 
-    def _handle_unsubscribe(self, user, author):
+    def handle_unsubscribe(self, user, author):
         """Обработать отписку от автора."""
         follow = Follow.objects.filter(user=user, author=author)
         if follow.exists():
@@ -116,11 +116,11 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
 
         if request.method == "PUT":
-            return self._handle_avatar_update(user, request)
+            return self.handle_avatar_update(user, request)
         elif request.method == "DELETE":
-            return self._handle_avatar_delete(user)
+            return self.handle_avatar_delete(user)
 
-    def _handle_avatar_update(self, user, request):
+    def handle_avatar_update(self, user, request):
         """Обработать обновление аватара."""
         if "avatar" not in request.data:
             return Response(
@@ -137,7 +137,7 @@ class CustomUserViewSet(UserViewSet):
         serializer.save()
         return Response(serializer.data)
 
-    def _handle_avatar_delete(self, user):
+    def handle_avatar_delete(self, user):
         """Обработать удаление аватара."""
         user.avatar.delete()
         user.save()
