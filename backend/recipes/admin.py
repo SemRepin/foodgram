@@ -6,7 +6,6 @@ from .models import (
 
 
 class RecipeIngredientInline(admin.TabularInline):
-    """Инлайн для ингредиентов в рецепте."""
 
     model = RecipeIngredient
     extra = 1
@@ -14,7 +13,6 @@ class RecipeIngredientInline(admin.TabularInline):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    """Админка для тегов."""
 
     list_display = ("name", "slug")
     search_fields = ("name",)
@@ -24,7 +22,6 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    """Админка для ингредиентов."""
 
     list_display = ("name", "measurement_unit")
     search_fields = ("name",)
@@ -34,7 +31,6 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    """Админка для рецептов."""
 
     list_display = ("name", "author", "get_favorites_count")
     search_fields = ("name", "author__username")
@@ -50,7 +46,6 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    """Админка для избранного."""
 
     list_display = ("user", "recipe")
     search_fields = ("user__username", "recipe__name")
@@ -58,7 +53,6 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    """Админка для списка покупок."""
 
     list_display = ("user", "recipe")
     search_fields = ("user__username", "recipe__name")

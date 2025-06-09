@@ -6,7 +6,6 @@ from .models import Follow, User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    """Админка для пользователей."""
 
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
     search_fields = ("username", "email")
@@ -17,7 +16,6 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    """Админка для подписок."""
 
     list_display = ("user", "author")
     search_fields = ("user__username", "author__username")

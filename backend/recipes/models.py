@@ -148,7 +148,7 @@ class RecipeIngredient(models.Model):
             MinValueValidator(
                 MIN_INGREDIENTS_COUNT,
                 message=(
-                    f"Количество ингредиентов не может быть меньше "
+                    f"Количество ингредиента не может быть меньше "
                     f"{MIN_INGREDIENTS_COUNT}"
                 ),
             )
