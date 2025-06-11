@@ -163,7 +163,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
 
         short_link = (
-            f"{request.build_absolute_uri('/').rstrip('/')}/s/{recipe_id}/"
+            f"{request.build_absolute_uri('/').rstrip('/')}/s/{recipe_id}"
         )
         return Response({"short-link": short_link})
 
