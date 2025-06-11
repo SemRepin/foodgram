@@ -18,6 +18,11 @@ class CustomUserAdmin(UserAdmin):
 class FollowAdmin(admin.ModelAdmin):
 
     list_display = ("user", "author")
-    search_fields = ("user__username", "author__username")
+    search_fields = (
+        "user__username",
+        "author__username",
+        "user__email",
+        "author__email",
+    )
     search_help_text = "Поиск по имени пользователя или email"
     list_filter = ("user", "author")

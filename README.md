@@ -1,3 +1,8 @@
+### Данные для админки
+Адрес: https://foodgramchik.sytes.net/
+Логин: admin@foodgram.com
+Пароль: admin123
+
 <img align="right" width="102" height="90" src="frontend/public/favicon.png">
 
 # Foodgram - веб-приложение для публикации рецептов

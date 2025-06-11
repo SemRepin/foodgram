@@ -21,11 +21,6 @@ from .serializers import (
     TagSerializer,
 )
 
-CREATED = status.HTTP_201_CREATED
-NO_CONTENT = status.HTTP_204_NO_CONTENT
-BAD_REQUEST = status.HTTP_400_BAD_REQUEST
-NOT_FOUND = status.HTTP_404_NOT_FOUND
-
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet для тегов."""
@@ -93,19 +88,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Обработать добавление рецепта в коллекцию."""
         if model.objects.filter(user=user, recipe=recipe).exists():
             return Response(
-                {"errors": "Рецепт уже добавлен"}, status=BAD_REQUEST
+                {"errors": "Рецепт уже добавлен"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         model.objects.create(user=user, recipe=recipe)
         serializer = RecipeShortSerializer(recipe)
-        return Response(serializer.data, status=CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def handle_remove_recipe(self, user, recipe, model):
         """Обработать удаление рецепта из коллекции."""
         obj = model.objects.filter(user=user, recipe=recipe)
         if obj.exists():
             obj.delete()
-            return Response(status=NO_CONTENT)
-        return Response({"errors": "Рецепт не найден"}, status=BAD_REQUEST)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"errors": "Рецепт не найден"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     @action(
         detail=False, methods=["get"], permission_classes=[IsAuthenticated]
@@ -117,7 +116,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if not shopping_cart.exists():
             return Response(
-                {"errors": "Список покупок пуст"}, status=BAD_REQUEST
+                {"errors": "Список покупок пуст"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         ingredients = self.get_shopping_cart_ingredients(user)
@@ -140,14 +140,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def format_shopping_list(self, ingredients):
         """Форматировать список покупок."""
-        shopping_list = "Список покупок:\n\n"
+        shopping_list = ["Список покупок:\n"]
         for ingredient in ingredients:
-            shopping_list += (
+            shopping_list.append(
                 f"• {ingredient['ingredient__name']} "
                 f"({ingredient['ingredient__measurement_unit']}) — "
                 f"{ingredient['total_amount']}\n"
             )
-        return shopping_list
+        return "".join(shopping_list)
 
     @action(detail=True, methods=["get"], url_path="get-link")
     def get_link(self, request, **kwargs):
@@ -157,7 +157,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         try:
             Recipe.objects.get(id=recipe_id)
         except Recipe.DoesNotExist:
-            return Response({"errors": "Рецепт не найден"}, status=NOT_FOUND)
+            return Response(
+                {"errors": "Рецепт не найден"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         short_link = (
             f"{request.build_absolute_uri('/').rstrip('/')}/s/{recipe_id}/"
@@ -173,4 +176,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def redirect_to_recipe(self, request, **kwargs):
         """Редирект по короткой ссылке на страницу рецепта."""
         recipe_id = self.kwargs.get("pk")
-        return redirect(f"/recipes/{recipe_id}/")
+        return redirect(f"/recipes/{recipe_id}")

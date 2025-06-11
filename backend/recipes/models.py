@@ -42,7 +42,7 @@ class Ingredient(models.Model):
         "Название",
         max_length=INGREDIENT_MAX_LENGTH,
         help_text=(
-            f"Название ингредиента не должно превышать "
+            "Название ингредиента не должно превышать "
             f"{INGREDIENT_MAX_LENGTH} символов"
         ),
     )
@@ -50,7 +50,7 @@ class Ingredient(models.Model):
         "Единица измерения",
         max_length=MEASUREMENT_UNIT_MAX_LENGTH,
         help_text=(
-            f"Единица измерения не должна превышать "
+            "Единица измерения не должна превышать "
             f"{MEASUREMENT_UNIT_MAX_LENGTH} символов"
         ),
     )
@@ -82,7 +82,7 @@ class Recipe(models.Model):
         "Название",
         max_length=RECIPE_MAX_LENGTH,
         help_text=(
-            f"Название рецепта не должно превышать "
+            "Название рецепта не должно превышать "
             f"{RECIPE_MAX_LENGTH} символов"
         ),
     )
@@ -107,7 +107,7 @@ class Recipe(models.Model):
             MinValueValidator(
                 MIN_COOKING_TIME,
                 message=(
-                    f"Время приготовления не может быть меньше "
+                    "Время приготовления не может быть меньше "
                     f"{MIN_COOKING_TIME} минут"
                 ),
             )
@@ -148,7 +148,7 @@ class RecipeIngredient(models.Model):
             MinValueValidator(
                 MIN_INGREDIENTS_COUNT,
                 message=(
-                    f"Количество ингредиента не может быть меньше "
+                    "Количество ингредиента не может быть меньше "
                     f"{MIN_INGREDIENTS_COUNT}"
                 ),
             )

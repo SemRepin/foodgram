@@ -16,10 +16,6 @@ from .serializers import (
     FollowSerializer,
 )
 
-CREATED = status.HTTP_201_CREATED
-NO_CONTENT = status.HTTP_204_NO_CONTENT
-BAD_REQUEST = status.HTTP_400_BAD_REQUEST
-
 
 class CustomUserViewSet(UserViewSet):
     """ViewSet для пользователей."""
@@ -78,30 +74,30 @@ class CustomUserViewSet(UserViewSet):
         if user == author:
             return Response(
                 {"errors": "Нельзя подписаться на самого себя"},
-                status=BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        if self._is_user_subscribed_to_author(user, author):
+        if self.is_user_subscribed_to_author(user, author):
             return Response(
                 {"errors": "Вы уже подписаны на этого пользователя"},
-                status=BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         follow = Follow.objects.create(user=user, author=author)
         serializer = FollowSerializer(follow, context={"request": request})
-        return Response(serializer.data, status=CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def handle_unsubscribe(self, user, author):
         """Обработать отписку от автора."""
         follow = Follow.objects.filter(user=user, author=author)
         if follow.exists():
             follow.delete()
-            return Response(status=NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
             {"errors": "Вы не подписаны на этого пользователя"},
-            status=BAD_REQUEST,
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-    def _is_user_subscribed_to_author(self, user, author):
+    def is_user_subscribed_to_author(self, user, author):
         """Проверить подписку пользователя на автора."""
         return Follow.objects.filter(user=user, author=author).exists()
 
@@ -124,7 +120,8 @@ class CustomUserViewSet(UserViewSet):
         """Обработать обновление аватара."""
         if "avatar" not in request.data:
             return Response(
-                {"avatar": ["Это поле обязательно."]}, status=BAD_REQUEST
+                {"avatar": ["Это поле обязательно."]},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer = AvatarSerializer(
@@ -141,4 +138,4 @@ class CustomUserViewSet(UserViewSet):
         """Обработать удаление аватара."""
         user.avatar.delete()
         user.save()
-        return Response(status=NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)

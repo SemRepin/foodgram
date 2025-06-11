@@ -1,7 +1,5 @@
-import base64
-
-from django.core.files.base import ContentFile
 from django.db import transaction
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from recipes.constants import (
@@ -11,17 +9,6 @@ from recipes.models import (
     Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag,
 )
 from users.serializers import CustomUserSerializer
-
-
-class Base64ImageField(serializers.ImageField):
-    """Кастомное поле для обработки изображений в base64."""
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith("data:image"):
-            format, imgstr = data.split(";base64,")
-            ext = format.split("/")[-1]
-            data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
-        return super().to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -58,7 +45,9 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания ингредиентов в рецепте."""
 
     id = serializers.IntegerField(required=True)
-    amount = serializers.IntegerField(required=True, min_value=1)
+    amount = serializers.IntegerField(
+        required=True, min_value=MIN_INGREDIENTS_COUNT
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -83,6 +72,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -132,7 +122,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     name = serializers.CharField(required=True, max_length=RECIPE_MAX_LENGTH)
     text = serializers.CharField(required=True)
-    cooking_time = serializers.IntegerField(required=True, min_value=1)
+    cooking_time = serializers.IntegerField(
+        required=True, min_value=MIN_COOKING_TIME
+    )
 
     class Meta:
         model = Recipe
@@ -162,8 +154,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, value):
         if value < MIN_COOKING_TIME:
             raise serializers.ValidationError(
-                f"Время приготовления должно быть больше либо равно "
+                "Время приготовления должно быть больше либо равно "
                 f"{MIN_COOKING_TIME}."
+            )
+        return value
+
+    def validate_image(self, value):
+        if not value or value == "":
+            raise serializers.ValidationError(
+                "Изображение рецепта обязательно."
             )
         return value
 
@@ -188,7 +187,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         for item in value:
             if item["amount"] < MIN_INGREDIENTS_COUNT:
                 raise serializers.ValidationError(
-                    f"Количество ингредиента должно быть больше либо равно "
+                    "Количество ингредиента должно быть больше либо равно "
                     f"{MIN_INGREDIENTS_COUNT}."
                 )
 
@@ -203,6 +202,35 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         return value
 
+    def validate(self, data):
+        """Общая валидация данных (для update)."""
+        if self.instance:
+            required_fields = {
+                "name": "Название рецепта обязательно.",
+                "text": "Описание рецепта обязательно.",
+                "cooking_time": "Время приготовления обязательно.",
+                "image": "Изображение рецепта обязательно.",
+                "ingredients": "Ингредиенты обязательны.",
+                "tags": "Теги обязательны.",
+            }
+
+            for field, error_message in required_fields.items():
+                if field not in self.initial_data:
+                    raise serializers.ValidationError({field: error_message})
+        return data
+
+    def create_recipe_ingredients(self, recipe, ingredients_data):
+        """Создать ингредиенты для рецепта."""
+        recipe_ingredients = [
+            RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=ingredient_data["id"],
+                amount=ingredient_data["amount"],
+            )
+            for ingredient_data in ingredients_data
+        ]
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
     @transaction.atomic
     def create(self, validated_data):
         """Создать рецепт."""
@@ -210,29 +238,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop("tags")
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-
-        for ingredient_data in ingredients_data:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient_id=ingredient_data["id"],
-                amount=ingredient_data["amount"],
-            )
-
+        self.create_recipe_ingredients(recipe, ingredients_data)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
         """Обновить рецепт."""
-        if "ingredients" not in self.initial_data:
-            raise serializers.ValidationError(
-                {"ingredients": "Это поле обязательно."}
-            )
-
-        if "tags" not in self.initial_data:
-            raise serializers.ValidationError(
-                {"tags": "Это поле обязательно."}
-            )
-
         ingredients_data = validated_data.pop("ingredients", None)
         tags = validated_data.pop("tags", None)
 
@@ -241,12 +252,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         if ingredients_data is not None:
             instance.recipe_ingredients.all().delete()
-            for ingredient_data in ingredients_data:
-                RecipeIngredient.objects.create(
-                    recipe=instance,
-                    ingredient_id=ingredient_data["id"],
-                    amount=ingredient_data["amount"],
-                )
+            self.create_recipe_ingredients(instance, ingredients_data)
 
         return super().update(instance, validated_data)
 
