@@ -176,4 +176,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def redirect_to_recipe(self, request, **kwargs):
         """Редирект по короткой ссылке на страницу рецепта."""
         recipe_id = self.kwargs.get("pk")
-        return redirect(f"/recipes/{recipe_id}")
+        return redirect(f"/recipes/{recipe_id}/")
