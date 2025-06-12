@@ -209,7 +209,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 "name": "Название рецепта обязательно.",
                 "text": "Описание рецепта обязательно.",
                 "cooking_time": "Время приготовления обязательно.",
-                "image": "Изображение рецепта обязательно.",
                 "ingredients": "Ингредиенты обязательны.",
                 "tags": "Теги обязательны.",
             }
@@ -217,6 +216,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             for field, error_message in required_fields.items():
                 if field not in self.initial_data:
                     raise serializers.ValidationError({field: error_message})
+
+            if not self.instance.image and "image" not in self.initial_data:
+                raise serializers.ValidationError(
+                    {"image": "Изображение рецепта обязательно."}
+                )
+
         return data
 
     def create_recipe_ingredients(self, recipe, ingredients_data):
