@@ -1,6 +1,6 @@
 from django.db.models import Sum
-from django.http import HttpResponse, HttpResponsePermanentRedirect
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
@@ -176,5 +176,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def redirect_to_recipe(self, request, **kwargs):
         """Редирект по короткой ссылке на страницу рецепта (без слэша)."""
         recipe_id = self.kwargs.get("pk")
-        full_url = request.build_absolute_uri(f"/recipes/{recipe_id}")
-        return HttpResponsePermanentRedirect(full_url)
+        return redirect(f"/recipes/{recipe_id}") 
