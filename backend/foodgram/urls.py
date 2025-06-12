@@ -10,7 +10,7 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/", include("api.urls")),
     path(
-        "s/<int:pk>",
+        "s/<int:pk>/",
         RecipeViewSet.as_view({"get": "redirect_to_recipe"}),
         name="short_link",
     ),
