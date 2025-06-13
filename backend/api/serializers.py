@@ -206,7 +206,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        """Валидация для обновления рецепта без полей tags, ingredients и/или image."""
+        """Валидация для обновления без полей tags, ingredients и/или image."""
         if self.instance:
             for field, error_message in {
                 "tags": "Теги обязательны.",
