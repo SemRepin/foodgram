@@ -16,7 +16,7 @@ class Command(BaseCommand):
             "--path",
             type=str,
             help="Путь к CSV файлу с ингредиентами",
-            default="/app/data/ingredients.csv",
+            default="data/ingredients.csv",
         )
 
     def handle(self, *args, **options):
